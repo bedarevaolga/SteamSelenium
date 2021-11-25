@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="Suite">
-    <parameter name="language" value="English"/>
+    <parameter name="language" value="Italian"/>
     <parameter name="year" value="1990"/>
-    <parameter name="gameName" value="Sleeping Dogs: Definitive Edition"/>
+    <parameter name="gameName" value="Forza Horizon 4"/>
 <!--    <test name = "Test On Firefox">-->
 <!--        <parameter name="browser" value="firefox"/>-->
 <!--        <classes>-->

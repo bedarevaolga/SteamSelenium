@@ -16,7 +16,7 @@ public class ActionPage extends Page {
     private final By divDiscount = By.xpath("//div[@class='capsule header']/following-sibling::div/descendant::div[@class=\"discount_pct\"]");
     private final String divMaxDiscount = "//div[@class='capsule header']/following-sibling::div/descendant::div[@class=\"discount_pct\" and text()='%s']";
 
-    public void findDiscounts() {
+    public int findMaxDiscounts() {
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", driver.findElement(divDiscount));
         List<WebElement> discounts = driver.findElements(divDiscount);
 
@@ -27,8 +27,12 @@ public class ActionPage extends Page {
                 maxDiscount = parseDiscounts(element.getText());
             }
         }
+        return maxDiscount;
+    }
 
-        List<WebElement> maxDiscountsList = findElementsByName(divMaxDiscount, "-" + maxDiscount + "%");
+    public void choseGameWithMaxDiscount() {
+
+        List<WebElement> maxDiscountsList = findElementsByName(divMaxDiscount, "-" + findMaxDiscounts() + "%");
         if(maxDiscountsList.size() == 1){
             maxDiscountsList.get(0).click();
         } else {

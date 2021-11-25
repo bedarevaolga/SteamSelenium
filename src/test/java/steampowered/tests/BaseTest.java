@@ -1,6 +1,7 @@
 package steampowered.tests;
 
 import framework.Browser;
+import framework.ConfigLoader;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -12,6 +13,7 @@ import steampowered.pages.MainPage;
 
 public class BaseTest {
 
+    private static Browser currentBrowser ;
     public static MainPage mainPage;
     public static ActionPage actionPage;
     public static GamePage gamePage;
@@ -20,19 +22,20 @@ public class BaseTest {
     @BeforeClass
     @Parameters({"browser"})
     public static void testSetup(String browser) {
-        Browser.getInstance().SetUp(browser);
+        currentBrowser = Browser.getInstance(browser);
+      currentBrowser.navigate(ConfigLoader.getProperty("url"));
     }
 
     @Test
-    @Parameters({"language", "year", "gameName"})
-    public void testChooseGameWithMaxDiscount(String language, String year, String gameName) {
+    @Parameters({"browser","language", "year", "gameName"})
+    public void testChooseGameWithMaxDiscount(String browser, String language, String year, String gameName) {
 
-        mainPage = new MainPage(Browser.getInstance().getDriver());
+        mainPage = new MainPage(currentBrowser.getDriver());
         mainPage.changeLanguage(language);
         mainPage.navigateSection("Categories", "Action");
-        actionPage = new ActionPage(Browser.getInstance().getDriver());
-        actionPage.findDiscounts();
-        gamePage = new GamePage(Browser.getInstance().getDriver());
+        actionPage = new ActionPage(currentBrowser.getDriver());
+        actionPage.choseGameWithMaxDiscount();
+        gamePage = new GamePage(currentBrowser.getDriver());
         Assert.assertEquals(gamePage.getGameName(year), gameName);
         gamePage.installGame("Install Steam");
         Assert.assertTrue(gamePage.isDownloadsExists());
@@ -40,7 +43,7 @@ public class BaseTest {
 
     @AfterClass
     public void closeBrowser() {
-           Browser.getInstance().teardown();
+         currentBrowser.teardown();
     }
 
 

@@ -14,46 +14,29 @@ import java.util.concurrent.TimeUnit;
 public final class Browser {
 
     private static Browser instance;
+    private static WebDriver driver;
 
-
-    public static Browser getInstance() {
-        if (instance == null) instance = new Browser();
+    public static Browser getInstance(String browser) {
+        if (instance == null) {
+            BrowserFactory browserFactory = new BrowserFactory();
+            driver = browserFactory.setUp(browser);
+            driver.manage().window().maximize();
+            driver.manage().timeouts().pageLoadTimeout(Integer.parseInt(ConfigLoader.getProperty("pageLoadTimeout")), TimeUnit.SECONDS)
+                    .implicitlyWait(Integer.parseInt(ConfigLoader.getProperty("implicitlyWait")), TimeUnit.SECONDS)
+                    .setScriptTimeout(Integer.parseInt(ConfigLoader.getProperty("setScriptTimeout")), TimeUnit.SECONDS);
+            instance = new Browser();
+        }
         return instance;
     }
+
+    public void navigate(String url) {
+        driver.get(url);
+    }
+
 
     private Browser() {
     }
 
-    private WebDriver driver;
-
-    public void SetUp(String browser) {
-
-        switch (browser.toUpperCase(Locale.ROOT)) {
-            case "CHROME" -> {
-                ChromeOptions options = new ChromeOptions();
-                HashMap<String, Object> chromePref = new HashMap<>();
-                chromePref.put("safebrowsing.enabled", true);
-                chromePref.put("download.default_directory", ConfigLoader.getProperty("downloadPath"));
-                options.setExperimentalOption("prefs", chromePref);
-                System.setProperty("webdriver.chrome.driver", "src/test/resources/drivers/chromedriver.exe");
-                driver = new ChromeDriver(options);
-            }
-            case "FIREFOX" -> {
-                FirefoxOptions firefoxOptions = new FirefoxOptions();
-                FirefoxProfile firefoxProfile = new FirefoxProfile();
-                firefoxProfile.setPreference("browser.download.folderList", 2);
-                firefoxProfile.setPreference("browser.download.dir", ConfigLoader.getProperty("downloadPath"));
-                firefoxProfile.setPreference("browser.helperApps.neverAsk.openFile", "application/octet-stream");
-                firefoxProfile.setPreference("browser.helperApps.neverAsk.saveToDisk", "application/octet-stream");
-                firefoxOptions.setProfile(firefoxProfile);
-                System.setProperty("webdriver.gecko.driver", "src/test/resources/drivers/geckodriver.exe");
-                driver = new FirefoxDriver(firefoxOptions);
-            }
-        }
-        driver.manage().window().maximize();
-        driver.manage().timeouts().pageLoadTimeout(15, TimeUnit.SECONDS).implicitlyWait(15, TimeUnit.SECONDS).setScriptTimeout(15, TimeUnit.SECONDS);
-        driver.get(ConfigLoader.getProperty("url"));
-    }
 
     public WebDriver getDriver() {
         return driver;
